@@ -1,6 +1,6 @@
 import express, { response } from "express"
 import jwt from "jsonwebtoken"
-import { getPosts } from "./database/posts.js"
+import { getPosts, setPost } from "./database/posts.js"
 import { auth } from "./database/users.js"
 
 
@@ -30,6 +30,17 @@ app.get("/posts", async (req, res) => {
     const posts = await getPosts(decodedToken.id)
 
     res.json({ message: "Listar posts", data: posts })
+})
+
+app.post("/posts", async (req, res) => {
+    const postData = req.body
+    const codedToken = req.headers.authorization
+    if(!codedToken){
+        return res.status(401).json({ message: "Usuario no autorizado para publicar. Debe enviar token de acceso." })
+    }
+    const decoded = jwt.verify(codedToken, secretKey)
+    const newPost = await setPost(decoded.id, postData)
+    res.json({ message: "Post registrado con exito", data: newPost })
 })
 
 app.listen(port, () => {
