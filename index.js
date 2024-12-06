@@ -2,6 +2,11 @@ import express, { response } from "express";
 import jwt from "jsonwebtoken";
 import { getPosts, setPost, updatePost } from "./database/posts.js";
 import { auth } from "./database/users.js";
+import { dirname } from "path"
+import { fileURLToPath } from "url"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const app = express();
 const port = 3000;
@@ -9,6 +14,9 @@ const secretKey = "um0987";
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.sendFile(`${__dirname}/views/index.html`)
+})
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   const user = await auth(username, password);
